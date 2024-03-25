@@ -62,6 +62,7 @@ jobs:
         run: terraform plan -var-file=values.tfvars
 
   Apply:
+    needs: Test
     runs-on: ubuntu-latest
     environment: production
 
