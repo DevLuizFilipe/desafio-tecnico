@@ -1,5 +1,5 @@
 module "ecs-fargate" {
-  source = "git::https://github.com/DevLuizFilipe/terraform-aws-ecs-fargate"
+  source = "../modules"
   count  = var.create_ecs ? length(var.ecs) : 0
 
   region             = var.region
