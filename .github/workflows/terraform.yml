@@ -55,7 +55,7 @@ jobs:
 
       - name: Terraform Format
         working-directory: ./infra/
-        run: terraform fmt -check
+        run: terraform fmt -recursive
 
       - name: Terraform Plan
         working-directory: ./infra/
