@@ -1,4 +1,4 @@
-resource "'aws_s3_bucket" "bucket-front-end" {
+resource "aws_s3_bucket" "bucket-front-end" {
   bucket = "globo-desafio-tecnico-devops"
   acl    = "public-read"
 }
