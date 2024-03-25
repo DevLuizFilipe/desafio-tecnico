@@ -15,6 +15,11 @@ variable "app_name" {
 }
 
 ######################## ECR Values ############################
+variable "create_ecr" {
+  description = "ECR control creation"
+  type        = bool
+}
+
 variable "ecr" {
   description = "ECR Configuration"
   type        = any

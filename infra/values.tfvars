@@ -3,6 +3,7 @@ region   = "us-west-2"
 env      = "production"
 app_name = "Comments"
 ######################## ECR Values ############################
+create_ecr = true
 ecr = [{
   name = "comments"
 }]
