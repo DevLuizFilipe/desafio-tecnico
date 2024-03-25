@@ -24,7 +24,6 @@ jobs:
         continue-on-error: true
 
   Test:
-    name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
 
@@ -63,7 +62,6 @@ jobs:
         run: terraform plan -var-file=values.tfvars
 
   Apply:
-    name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
 
