@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   scan:
-    runs-on: ubuntu-local
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
