@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comentários</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #007bff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="email"],
+        input[type="number"],
+        textarea,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .commentItem {
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comentários</h1>
+
+        <h2>Adicionar Comentário:</h2>
+        <form id="commentForm">
+            <label for="email">Seu Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
+            <label for="comment">Seu Comentário:</label><br>
+            <textarea id="comment" name="comment" required></textarea><br>
+            <label for="contentId">ID do Conteúdo:</label><br>
+            <input type="number" id="contentId" name="contentId" required><br>
+            <button type="submit">Enviar</button>
+        </form>
+
+        <h2>Meus Comentários:</h2>
+        <div id="myCommentsList"></div>
+
+        <h2>Lista de Comentários:</h2>
+        <div id="commentList"></div>
+    </div>
+
+    <script>
+        const backendURL = 'http://example.com'; // Substitua pelo URL do seu backend
+
+        document.getElementById('commentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const requestData = {};
+            formData.forEach((value, key) => {
+                requestData[key] = value;
+            });
+            
+            fetch(`${backendURL}/api/comment/new`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Comentário adicionado com sucesso:', data);
+                document.getElementById('commentForm').reset();
+                fetchComments();
+                fetchMyComments(requestData.email); // Fetch my comments after adding a new one
+            })
+            .catch(error => {
+                console.error('Erro ao adicionar comentário:', error);
+            });
+        });
+
+        function fetchComments() {
+            fetch(`${backendURL}/api/comment/list/${document.getElementById('contentId').value}`)
+            .then(response => response.json())
+            .then(comments => {
+                const commentListElement = document.getElementById('commentList');
+                commentListElement.innerHTML = ''; // Limpa a lista de comentários
+                comments.forEach(comment => {
+                    const commentItem = document.createElement('div');
+                    commentItem.classList.add('commentItem');
+                    commentItem.textContent = comment.comment;
+                    commentListElement.appendChild(commentItem);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar comentários:', error);
+            });
+        }
+
+        function fetchMyComments(email) {
+            fetch(`${backendURL}/api/comment/my/${email}`)
+            .then(response => response.json())
+            .then(comments => {
+                const myCommentsListElement = document.getElementById('myCommentsList');
+                myCommentsListElement.innerHTML = ''; // Limpa a lista de meus comentários
+                comments.forEach(comment => {
+                    const commentItem = document.createElement('div');
+                    commentItem.classList.add('commentItem');
+                    commentItem.textContent = comment.comment;
+                    myCommentsListElement.appendChild(commentItem);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar meus comentários:', error);
+            });
+        }
+
+        // Carrega os comentários quando a página carrega
+        fetchComments();
+    </script>
+</body>
+</html>
