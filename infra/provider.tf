@@ -13,6 +13,6 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket = "terraform-tfstate-versioning"
-    key   = "terraform.tfstate"
+    key    = "terraform.tfstate"
   }
 }
