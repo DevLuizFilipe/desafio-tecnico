@@ -54,7 +54,6 @@ jobs:
         run: terraform validate
 
       - name: Terraform Format
-        working-directory: ./infra/
         run: terraform fmt -recursive
 
       - name: Terraform Plan
