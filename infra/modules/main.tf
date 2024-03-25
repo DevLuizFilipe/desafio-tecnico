@@ -154,6 +154,8 @@ resource "aws_lb" "main" {
   idle_timeout       = "30"
   security_groups    = [aws_security_group.lb_access.id]
   subnets            = data.aws_subnets.subnets.ids
+
+  depends_on = [ data.aws_subnets.subnets ]
 }
 
 resource "aws_lb_listener" "listener" {
