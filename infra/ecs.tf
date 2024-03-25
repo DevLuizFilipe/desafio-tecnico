@@ -1,5 +1,5 @@
 module "ecs-fargate" {
-  source = "../modules/"
+  source = "./modules/"
   count  = var.create_ecs ? length(var.ecs) : 0
 
   region             = var.region
