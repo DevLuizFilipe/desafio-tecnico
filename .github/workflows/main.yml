@@ -30,8 +30,8 @@ jobs:
         run: docker run -v $(pwd):/path -i checkmarx/kics:latest scan -p "/path"
         continue-on-error: true
 
-  Validate:
-    name: terraform-validate
+  Plan:
+    name: terraform-plan
     runs-on: ubuntu-latest
     environment: production
 
@@ -60,34 +60,6 @@ jobs:
       - name: Terraform Validate
         working-directory: ./infra/
         run: terraform validate
-
-  Plan:
-    needs: Validate
-    name: terraform-plan
-    runs-on: ubuntu-latest
-    environment: production
-
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configurando AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Terraform Init
-        working-directory: ./infra/
-        run: terraform init
 
       - name: Terraform Plan
         working-directory: ./infra/
