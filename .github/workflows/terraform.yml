@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          path: 'infra/'
 
       - name: Baixando imagem do KICS
         run: docker pull checkmarx/kics:latest
@@ -34,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          path: 'infra/'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -56,6 +60,11 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -var-file=values.tfvars
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var-file=values.tfvars
+
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
