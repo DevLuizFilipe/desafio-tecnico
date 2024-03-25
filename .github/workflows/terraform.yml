@@ -14,17 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: 'infra/'
 
       - name: Baixando imagem do KICS
         run: docker pull checkmarx/kics:latest
 
       - name: Executando o KICS Scan
+        working-directory: ./infra/
         run: docker run -v $(pwd):/path -i checkmarx/kics:latest scan -p "/path"
         continue-on-error: true
 
-  terraform:
+  Test:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
@@ -36,8 +35,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: 'infra/'
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -50,22 +47,49 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Terraform Init
+        working-directory: ./infra/
         run: terraform init
 
       - name: Terraform Validate
+        working-directory: ./infra/
         run: terraform validate
 
       - name: Terraform Format
+        working-directory: ./infra/
         run: terraform fmt -check
 
       - name: Terraform Plan
+        working-directory: ./infra/
         run: terraform plan -var-file=values.tfvars
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false -var-file=values.tfvars
+  Apply:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
 
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configurando AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./infra/
+        run: terraform init
 
       - name: Terraform Apply
+        working-directory: ./infra/
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false -var-file=values.tfvars
