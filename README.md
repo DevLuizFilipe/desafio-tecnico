@@ -1,6 +1,7 @@
-# Documentação do Projeto
+# Documentação do Projeto de API de Coméntarios - 26 de Março de 2024 - Luiz Filipe Santana Martins
 
 Este documento descreve as tecnologias utilizadas, a arquitetura implementada e as customizações realizadas no projeto.
+Na pasta imagens do projeto, contém evidências como testes, diagrama de arquitetura e redes, teste de API, frontend e environment no GitHub.
 
 ## Tecnologias Utilizadas
 
@@ -26,7 +27,7 @@ A infraestrutura foi projetada para garantir alta disponibilidade, escalabilidad
 
 ## Customizações no Projeto Base
 
-- **Biblioteca de Logging**: Implementada na API Python para coletar métricas da aplicação e monitorar seu desempenho, permitindo uma análise detalhada do comportamento da aplicação em produção.
+- **Biblioteca de Logging**: Implementada na API Python para coletar métricas da aplicação como por exemplo, status code, requisições HTTP, tempo de resposta, erros ... E monitorar seu desempenho, permitindo uma análise detalhada do comportamento da aplicação em produção.
 - **Rota Raiz ("/")**: Adicionada para permitir o health check do ECS, garantindo a disponibilidade da aplicação e facilitando o monitoramento contínuo.
 
 ## Diagramas de Arquitetura

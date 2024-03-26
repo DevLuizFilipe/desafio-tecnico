@@ -54,6 +54,8 @@ resource "aws_iam_policy" "ECSTaskPolicy" {
         Effect = "Allow",
         Action = [
           "ecr:*",
+          "logs:*",
+          "cloudwatch:*",
           "secretsmanager:GetSecretValue",
         ],
         Resource = "*"
@@ -128,6 +130,9 @@ resource "aws_ecs_task_definition" "ecs_task" {
             "containerPort" : var.container_port,
           }
         ]
+        "enable_cloudwatch_logging": "true"
+        "create_cloudwatch_log_group": "true"
+        "cloudwatch_log_group_name": "/ecs/${var.service_name}-log-group"
       }
   ])
 }
