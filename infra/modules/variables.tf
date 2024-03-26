@@ -69,8 +69,12 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "network_tag" {
-  description = "Tags used to filter ecs subnets "
+variable "private_subnets" {
+  description = "Tags used to filter ecs subnets privates "
   type        = string
-  default     = "ecs-subnets"
+}
+
+variable "public_subnets" {
+  description = "Tags used to filter ecs subnets publics"
+  type        = string
 }

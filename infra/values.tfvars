@@ -44,7 +44,8 @@ ecs = [
     container_memory   = 1024
     container_port     = 80
     image_url          = "nginx"
-    network_tag        = "private*"
+    public_subnets     = "public*"
+    private_subnets    = "private*"
     remote_cidr_blocks = ["0.0.0.0/0"] #CIDR block to allow traffic from
     service_name       = "comments"
   }

@@ -10,7 +10,8 @@ module "ecs-fargate" {
   container_port     = var.ecs[0].container_port
   image_url          = var.ecs[0].image_url
   desired_count      = var.ecs[0].desired_count
-  network_tag        = var.ecs[0].network_tag
+  public_subnets     = var.ecs[0].public_subnets
+  private_subnets    = var.ecs[0].private_subnets
   remote_cidr_blocks = var.ecs[0].remote_cidr_blocks
   service_name       = var.ecs[0].service_name
 }

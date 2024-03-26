@@ -10,10 +10,18 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_subnets" "subnets" {
+data "aws_subnets" "private_subnets" {
   filter {
     name   = "tag:Name"
-    values = ["${var.network_tag}"]
+    values = ["${var.private_subnets}"]
+
+  }
+}
+
+data "aws_subnets" "public_subnets" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.public_subnets}"]
 
   }
 }
@@ -133,7 +141,7 @@ resource "aws_ecs_service" "ecs_service" {
   deployment_minimum_healthy_percent = "75"
   desired_count                      = var.desired_count
   network_configuration {
-    subnets         = data.aws_subnets.subnets.ids
+    subnets         = data.aws_subnets.private_subnets.ids
     security_groups = [aws_security_group.fargate_container_sg.id]
   }
   # Track the latest ACTIVE revision
@@ -175,9 +183,9 @@ resource "aws_lb" "main" {
   load_balancer_type = "application"
   idle_timeout       = "30"
   security_groups    = [aws_security_group.lb_access.id]
-  subnets            = data.aws_subnets.subnets.ids
+  subnets            = data.aws_subnets.public_subnets.ids
 
-  depends_on = [data.aws_subnets.subnets]
+  depends_on = [data.aws_subnets.public_subnets]
 }
 
 resource "aws_lb_listener" "listener" {
