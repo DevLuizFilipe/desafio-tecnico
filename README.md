@@ -1,5 +1,5 @@
-# Documentação do Projeto
-# API de Coméntarios - 26 de Março de 2024 - Luiz Filipe Santana Martins
+# API de Coméntarios
+# 26 de Março de 2024 - Luiz Filipe Santana Martins
 
 Este documento descreve as tecnologias utilizadas, a arquitetura implementada e as customizações realizadas no projeto.
 Na pasta imagens do projeto, contém evidências como testes, diagrama de arquitetura e redes, teste de API, frontend e environment no GitHub.
@@ -40,13 +40,13 @@ Foi criado um diagrama representando a arquitetura atual do projeto, destacando 
 A pipeline de CI/CD automatiza o processo de construção, teste e implantação da aplicação. Ela inclui:
 
 - **Deploy do Terraform**: Provisiona a infraestrutura de forma consistente e segura, permitindo a implantação rápida e confiável dos recursos necessários.
-- **Análise de Segurança com KICS**: Identifica e corrige potenciais vulnerabilidades na infraestrutura, garantindo um ambiente seguro e protegido contra ameaças.
+- **Análise de Segurança com KICS**: Identifica potenciais vulnerabilidades na infraestrutura, evidenciando um ambiente seguro e protegido contra ameaças.
 - **Construção e Envio da Imagem Docker**: Compila a aplicação e a disponibiliza no repositório ECR, permitindo uma implantação eficiente e automatizada.
 - **Atualização do Serviço ECS**: Atualiza automaticamente o serviço ECS com a nova versão da aplicação, garantindo a implantação contínua e sem interrupções.
 
 ## Conclusão
 
-A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários e responder rapidamente às mudanças no mercado.
+A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários.
 
 ## Cenário Futuro
 
