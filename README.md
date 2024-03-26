@@ -1,4 +1,5 @@
-# Documentação do Projeto de API de Coméntarios - 26 de Março de 2024 - Luiz Filipe Santana Martins
+# Documentação do Projeto
+# API de Coméntarios - 26 de Março de 2024 - Luiz Filipe Santana Martins
 
 Este documento descreve as tecnologias utilizadas, a arquitetura implementada e as customizações realizadas no projeto.
 Na pasta imagens do projeto, contém evidências como testes, diagrama de arquitetura e redes, teste de API, frontend e environment no GitHub.
