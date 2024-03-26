@@ -27,7 +27,11 @@ A infraestrutura foi projetada para garantir alta disponibilidade, escalabilidad
 ## Customizações no Projeto Base
 
 - **Biblioteca de Logging**: Implementada na API Python para coletar métricas da aplicação e monitorar seu desempenho, permitindo uma análise detalhada do comportamento da aplicação em produção.
-- **Rota Raiz (Barra)**: Adicionada para permitir o health check do ECS, garantindo a disponibilidade da aplicação e facilitando o monitoramento contínuo.
+- **Rota Raiz ("/")**: Adicionada para permitir o health check do ECS, garantindo a disponibilidade da aplicação e facilitando o monitoramento contínuo.
+
+## Diagramas de Arquitetura
+
+Foi criado um diagrama representando a arquitetura atual do projeto, destacando os principais componentes e a interação entre eles. Além disso, foi desenvolvido um outro diagrama que ilustra uma possível arquitetura alternativa, considerando cenários em que houvesse mais tempo de execução para explorar outras opções e otimizações.
 
 ## Pipeline de CI/CD
 
@@ -40,4 +44,12 @@ A pipeline de CI/CD automatiza o processo de construção, teste e implantação
 
 ## Conclusão
 
-A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários.
+A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários e responder rapidamente às mudanças no mercado.
+
+## Cenário Futuro
+
+Em um cenário de maior tempo para execução do projetos, tais medidas seriam consideradas:
+
+- **Correção de Vulnerabilidades no ECR e no KICS**: Seriam corrigidas as vulnerabilidades apontadas no repositório ECR e pelo KICS, garantindo uma infraestrutura e aplicação mais segura e resiliente.
+- **Aprimoramento da Arquitetura**: Seria implementada uma arquitetura mais robusta e escalável, considerando a adição de redundância, segurança avançada, e demais serviços.
+
