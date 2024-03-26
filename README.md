@@ -33,9 +33,6 @@ A infraestrutura foi projetada para garantir alta disponibilidade, escalabilidad
 
 Foi criado um diagrama representando a arquitetura atual do projeto, destacando os principais componentes e a interação entre eles. Além disso, foi desenvolvido um outro diagrama que ilustra uma possível arquitetura alternativa, considerando cenários em que houvesse mais tempo de execução para explorar outras opções e otimizações.
 
-                                    ![Diagrama da rede](diagramas/diagrama-1.png)
-                                    ![Diagrama da arquitetura](diagramas/diagrama-2.png)
-
 ## Pipeline de CI/CD
 
 A pipeline de CI/CD automatiza o processo de construção, teste e implantação da aplicação. Ela inclui:
@@ -55,5 +52,3 @@ Em um cenário de maior tempo para execução do projetos, tais medidas seriam c
 
 - **Correção de Vulnerabilidades no ECR e no KICS**: Seriam corrigidas as vulnerabilidades apontadas no repositório ECR e pelo KICS, garantindo uma infraestrutura e aplicação mais segura e resiliente.
 - **Aprimoramento da Arquitetura**: Seria implementada uma arquitetura mais robusta e escalável, considerando a adição de redundância, segurança avançada, e demais serviços.
-
-                                        ![Diagrama futuro](diagramas/diagrama-3.png)
