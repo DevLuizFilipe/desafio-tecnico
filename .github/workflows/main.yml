@@ -131,9 +131,9 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-  deploy:
+  Deploy:
     name: Deploy to Amazon ECS
-    needs: build
+    needs: Build
     runs-on: ubuntu-latest
     environment: production
 
