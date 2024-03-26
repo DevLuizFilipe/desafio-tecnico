@@ -222,7 +222,7 @@ resource "aws_lb_target_group" "target_group" {
     port              = var.container_port
     timeout           = "10"
     healthy_threshold = "2"
-    interval          = "5"
+    interval          = "15"
   }
   vpc_id = var.vpc_id
 }
