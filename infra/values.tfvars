@@ -3,6 +3,7 @@ region   = "us-west-2"
 env      = "production"
 app_name = "Comments"
 ######################## ECR Values ############################
+create_ecr = true
 ecr = [{
   name = "comments"
 }]
@@ -42,8 +43,9 @@ ecs = [
     container_cpu      = 256
     container_memory   = 512
     container_port     = 8000
-    image_url          = "public.ecr.aws/n1x5i6u3/comments:latest"
-    network_tag        = "private*"
+    image_url          = "092801936354.dkr.ecr.us-west-2.amazonaws.com/comments:latest"
+    public_subnets     = "public*"
+    private_subnets    = "private*"
     remote_cidr_blocks = ["0.0.0.0/0"] #CIDR block to allow traffic from
     service_name       = "comments"
   }

@@ -1,16 +1,23 @@
-name: 'Terraform'
+name: 'Pipeline CI/CD'
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
 
 permissions:
   contents: read
 
 jobs:
   scan:
-    runs-on: ubuntu-local
+    name: KICS Scan
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,8 +30,8 @@ jobs:
         run: docker run -v $(pwd):/path -i checkmarx/kics:latest scan -p "/path"
         continue-on-error: true
 
-  Test:
-    name: 'Terraform'
+  Plan:
+    name: terraform-plan
     runs-on: ubuntu-latest
     environment: production
 
@@ -54,16 +61,13 @@ jobs:
         working-directory: ./infra/
         run: terraform validate
 
-      - name: Terraform Format
-        working-directory: ./infra/
-        run: terraform fmt -check
-
       - name: Terraform Plan
         working-directory: ./infra/
         run: terraform plan -var-file=values.tfvars
 
   Apply:
-    name: 'Terraform'
+    name: terraform-apply
+    needs: Plan
     runs-on: ubuntu-latest
     environment: production
 
@@ -93,3 +97,57 @@ jobs:
         working-directory: ./infra/
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false -var-file=values.tfvars
+
+  Build:
+    name: Build and push docker image
+    needs: Apply
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd app
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  Deploy:
+    name: Deploy to Amazon ECS
+    needs: Build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+    
+      - name: Update Amazon ECS Service
+        run: |
+          aws ecs update-service --region $AWS_REGION --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment

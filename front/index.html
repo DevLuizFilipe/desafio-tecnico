@@ -73,15 +73,12 @@
             <button type="submit">Enviar</button>
         </form>
 
-        <h2>Meus Comentários:</h2>
-        <div id="myCommentsList"></div>
-
         <h2>Lista de Comentários:</h2>
         <div id="commentList"></div>
     </div>
 
     <script>
-        const backendURL = 'http://example.com'; // Substitua pelo URL do seu backend
+        const backendURL = 'http://comments-lb-1013575474.us-west-2.elb.amazonaws.com';
 
         document.getElementById('commentForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -92,6 +89,8 @@
                 requestData[key] = value;
             });
             
+            console.log('Enviando requisição para adicionar comentário:', requestData);
+            
             fetch(`${backendURL}/api/comment/new`, {
                 method: 'POST',
                 headers: {
@@ -101,10 +100,10 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Resposta do servidor:', data);
                 console.log('Comentário adicionado com sucesso:', data);
                 document.getElementById('commentForm').reset();
                 fetchComments();
-                fetchMyComments(requestData.email); // Fetch my comments after adding a new one
             })
             .catch(error => {
                 console.error('Erro ao adicionar comentário:', error);
@@ -112,15 +111,18 @@
         });
 
         function fetchComments() {
-            fetch(`${backendURL}/api/comment/list/${document.getElementById('contentId').value}`)
+            const contentId = document.getElementById('contentId').value;
+            console.log('Enviando requisição para buscar comentários do conteúdo:', contentId);
+            fetch(`${backendURL}/api/comment/list/${contentId}`)
             .then(response => response.json())
             .then(comments => {
+                console.log('Resposta do servidor:', comments);
                 const commentListElement = document.getElementById('commentList');
-                commentListElement.innerHTML = ''; // Limpa a lista de comentários
+                commentListElement.innerHTML = ''; 
                 comments.forEach(comment => {
                     const commentItem = document.createElement('div');
                     commentItem.classList.add('commentItem');
-                    commentItem.textContent = comment.comment;
+                    commentItem.textContent = `${comment.email}: ${comment.comment}`;
                     commentListElement.appendChild(commentItem);
                 });
             })
@@ -129,25 +131,6 @@
             });
         }
 
-        function fetchMyComments(email) {
-            fetch(`${backendURL}/api/comment/my/${email}`)
-            .then(response => response.json())
-            .then(comments => {
-                const myCommentsListElement = document.getElementById('myCommentsList');
-                myCommentsListElement.innerHTML = ''; // Limpa a lista de meus comentários
-                comments.forEach(comment => {
-                    const commentItem = document.createElement('div');
-                    commentItem.classList.add('commentItem');
-                    commentItem.textContent = comment.comment;
-                    myCommentsListElement.appendChild(commentItem);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao carregar meus comentários:', error);
-            });
-        }
-
-        // Carrega os comentários quando a página carrega
         fetchComments();
     </script>
 </body>
