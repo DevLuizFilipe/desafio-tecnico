@@ -40,8 +40,8 @@ ecs = [
   {
     desired_count      = 1 #Number of service replicas to run
     name               = "comments"
-    container_cpu      = 256
-    container_memory   = 512
+    container_cpu      = 1024
+    container_memory   = 1024
     container_port     = 8000
     image_url          = "092801936354.dkr.ecr.us-west-2.amazonaws.com/comments:latest"
     network_tag        = "private*"

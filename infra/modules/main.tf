@@ -45,13 +45,7 @@ resource "aws_iam_policy" "ECSTaskPolicy" {
       {
         Effect = "Allow",
         Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:GetRepositoryPolicy",
-          "ecr:DescribeRepositories",
-          "ecr:ListImages",
-          "ecr:DescribeImages",
+          "ecr:*",
           "secretsmanager:GetSecretValue",
         ],
         Resource = "*"
@@ -226,9 +220,9 @@ resource "aws_lb_target_group" "target_group" {
     path              = "/"
     protocol          = "HTTP"
     port              = var.container_port
-    timeout           = "5"
+    timeout           = "10"
     healthy_threshold = "2"
-    interval          = "6"
+    interval          = "5"
   }
   vpc_id = var.vpc_id
 }
