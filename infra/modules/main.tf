@@ -21,8 +21,6 @@ data "aws_subnets" "subnets" {
 resource "aws_iam_role" "ECSTaskExecutionRole" {
   name = "${var.name}-role"
 
-  # Terraform's "jsonencode" function converts a
-  # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -35,6 +33,36 @@ resource "aws_iam_role" "ECSTaskExecutionRole" {
       },
     ]
   })
+}
+
+resource "aws_iam_policy" "ECSTaskPolicy" {
+  name        = "ECSTaskPolicy"
+  description = "Policy for ECS Task Execution Role"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetRepositoryPolicy",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages",
+          "secretsmanager:GetSecretValue",
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ECSTaskExecutionRolePolicyAttachment" {
+  role       = aws_iam_role.ECSTaskExecutionRole.name
+  policy_arn = aws_iam_policy.ECSTaskPolicy.arn
 }
 
 # ######
