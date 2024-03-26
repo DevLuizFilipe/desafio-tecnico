@@ -44,6 +44,10 @@ A pipeline de CI/CD automatiza o processo de construção, teste e implantação
 - **Construção e Envio da Imagem Docker**: Compila a aplicação e a disponibiliza no repositório ECR, permitindo uma implantação eficiente e automatizada.
 - **Atualização do Serviço ECS**: Atualiza automaticamente o serviço ECS com a nova versão da aplicação, garantindo a implantação contínua e sem interrupções.
 
+## Métricas da Aplicação
+
+Para obter métricas da aplicação e demais logs, basta acessar o painel da AWS no ECS, serviços na aba logs e será possível ver a aplicação e seus registros.
+
 ## Conclusão
 
 A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários e responder rapidamente às mudanças no mercado.

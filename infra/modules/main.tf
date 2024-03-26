@@ -117,23 +117,26 @@ resource "aws_ecs_task_definition" "ecs_task" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.ECSTaskExecutionRole.arn
 
-
-  container_definitions = jsonencode(
-    [
-      {
-        "cpu" : var.container_cpu,
-        "image" : var.image_url,
-        "memory" : var.container_memory,
-        "name" : var.service_name
-        "portMappings" : [
-          {
-            "containerPort" : var.container_port,
-          }
-        ]
-        "enable_cloudwatch_logging": "true"
-        "create_cloudwatch_log_group": "true"
-        "cloudwatch_log_group_name": "/ecs/${var.service_name}-log-group"
+  container_definitions = jsonencode([
+    {
+      cpu    = var.container_cpu
+      image  = var.image_url
+      memory = var.container_memory
+      name   = var.service_name
+      portMappings = [
+        {
+          containerPort = var.container_port
+        }
+      ]
+      log_configuration = {
+        log_driver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.service_name}-logs"
+          "awslogs-region"        = var.region
+          "awslogs-stream-prefix" = "ecs"
+        }
       }
+    }
   ])
 }
 
