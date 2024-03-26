@@ -99,7 +99,7 @@ jobs:
         run: terraform apply -auto-approve -input=false -var-file=values.tfvars
 
   Build:
-    name: Build Docker Image
+    name: Build and push docker image
     needs: Apply
     runs-on: ubuntu-latest
     environment: production
@@ -138,9 +138,16 @@ jobs:
     environment: production
 
     steps:
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+    
+      - name: Update Amazon ECS Service
+        run: |
+          aws ecs update-service --region $AWS_REGION --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
