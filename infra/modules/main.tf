@@ -119,13 +119,14 @@ resource "aws_ecs_task_definition" "ecs_task" {
 
   container_definitions = jsonencode([
     {
-      cpu    = var.container_cpu
-      image  = var.image_url
-      memory = var.container_memory
       name   = var.service_name
+      image  = var.image_url
+      cpu    = var.container_cpu
+      memory = var.container_memory
       portMappings = [
         {
           containerPort = var.container_port
+          protocol      = "tcp"
         }
       ]
       log_configuration = {
@@ -134,6 +135,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
           "awslogs-group"         = "/ecs/${var.service_name}-logs"
           "awslogs-region"        = var.region
           "awslogs-stream-prefix" = "ecs"
+          "awslogs-create-group"  = "true"
         }
       }
     }
