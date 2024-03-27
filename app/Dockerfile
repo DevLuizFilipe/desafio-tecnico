@@ -1,14 +1,16 @@
 FROM python:3.7.4-alpine
 
-RUN apk add --no-cache \
-    libffi-dev \
-    openssl-dev
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 WORKDIR /app
 
 COPY . /app
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r --no-cache-dir requirements.txt
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 8000
 
