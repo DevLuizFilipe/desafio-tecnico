@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comentários</title>
+    <title>Sistema de Comentários</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,14 +14,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
         .container {
             max-width: 800px;
+            width: 90%;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
         }
         h1, h2 {
             color: #333;
@@ -45,93 +47,230 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            font-weight: bold;
         }
         button:hover {
             background-color: #0056b3;
         }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
         .commentItem {
             background-color: #f4f4f4;
             border-radius: 5px;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 10px;
             text-align: left;
+            border-left: 3px solid #007bff;
+        }
+        .commentItem strong {
+            color: #007bff;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert.show {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Comentários</h1>
+        <h1>💬 Sistema de Comentários</h1>
 
-        <h2>Adicionar Comentário:</h2>
+        <div id="alertBox" class="alert"></div>
+
+        <h2>Adicionar Comentário</h2>
         <form id="commentForm">
-            <label for="email">Seu Email:</label><br>
-            <input type="email" id="email" name="email" required><br>
-            <label for="comment">Seu Comentário:</label><br>
-            <textarea id="comment" name="comment" required></textarea><br>
-            <label for="contentId">ID do Conteúdo:</label><br>
-            <input type="number" id="contentId" name="contentId" required><br>
-            <button type="submit">Enviar</button>
+            <label for="email">Seu Email:</label>
+            <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            
+            <label for="comment">Seu Comentário:</label>
+            <textarea id="comment" name="comment" rows="4" placeholder="Digite seu comentário aqui..." required></textarea>
+            
+            <label for="contentId">ID do Conteúdo:</label>
+            <input type="number" id="contentId" name="content_id" min="1" placeholder="Ex: 123" required>
+            
+            <button type="submit" id="submitBtn">Enviar Comentário</button>
         </form>
 
-        <h2>Lista de Comentários:</h2>
-        <div id="commentList"></div>
+        <h2>Lista de Comentários</h2>
+        <div id="commentList">
+            <div class="loading">Carregando comentários...</div>
+        </div>
     </div>
 
     <script>
-        const backendURL = 'http://comments-lb-1013575474.us-west-2.elb.amazonaws.com';
+        const CONFIG = {
+            backendURL: 'http://comments-lb-1013575474.us-west-2.elb.amazonaws.com',
+            timeout: 10000 
+        };
 
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
+        const commentForm = document.getElementById('commentForm');
+        const commentList = document.getElementById('commentList');
+        const alertBox = document.getElementById('alertBox');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showAlert(message, type = 'success') {
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type} show`;
+            
+            setTimeout(() => {
+                alertBox.className = 'alert';
+            }, 5000);
+        }
+        function fetchWithTimeout(url, options = {}, timeout = CONFIG.timeout) {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout da requisição')), timeout)
+                )
+            ]);
+        }
+        commentForm.addEventListener('submit', async function(event) {
             event.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
             
-            const formData = new FormData(this);
-            const requestData = {};
-            formData.forEach((value, key) => {
-                requestData[key] = value;
-            });
-            
-            console.log('Enviando requisição para adicionar comentário:', requestData);
-            
-            fetch(`${backendURL}/api/comment/new`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Resposta do servidor:', data);
-                console.log('Comentário adicionado com sucesso:', data);
-                document.getElementById('commentForm').reset();
-                fetchComments();
-            })
-            .catch(error => {
-                console.error('Erro ao adicionar comentário:', error);
-            });
-        });
+            try {
+                const formData = new FormData(this);
+                const requestData = {
+                    email: formData.get('email'),
+                    comment: formData.get('comment'),
+                    content_id: parseInt(formData.get('content_id')) // Convertendo para número
+                };
+                
+                console.log('📤 Enviando comentário:', requestData);
+                
+                const response = await fetchWithTimeout(
+                    `${CONFIG.backendURL}/api/comment/new`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestData)
+                    }
+                );
 
-        function fetchComments() {
-            const contentId = document.getElementById('contentId').value;
-            console.log('Enviando requisição para buscar comentários do conteúdo:', contentId);
-            fetch(`${backendURL}/api/comment/list/${contentId}`)
-            .then(response => response.json())
-            .then(comments => {
-                console.log('Resposta do servidor:', comments);
-                const commentListElement = document.getElementById('commentList');
-                commentListElement.innerHTML = ''; 
-                comments.forEach(comment => {
-                    const commentItem = document.createElement('div');
-                    commentItem.classList.add('commentItem');
-                    commentItem.textContent = `${comment.email}: ${comment.comment}`;
-                    commentListElement.appendChild(commentItem);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao carregar comentários:', error);
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Resposta do servidor:', data);
+                
+                showAlert('Comentário adicionado com sucesso!', 'success');
+                commentForm.reset();
+                await fetchComments(requestData.content_id);
+                
+            } catch (error) {
+                console.error('❌ Erro ao adicionar comentário:', error);
+                showAlert(`Erro ao adicionar comentário: ${error.message}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Comentário';
+            }
+        });
+        async function fetchComments(contentId = null) {
+            if (!contentId) {
+                const contentIdInput = document.getElementById('contentId').value;
+                if (!contentIdInput) {
+                    commentList.innerHTML = '<div class="empty-state">Digite um ID de conteúdo para ver os comentários</div>';
+                    return;
+                }
+                contentId = contentIdInput;
+            }
+
+            try {
+                commentList.innerHTML = '<div class="loading">Carregando comentários...</div>';
+                
+                console.log(`📥 Buscando comentários do conteúdo: ${contentId}`);
+                
+                const response = await fetchWithTimeout(
+                    `${CONFIG.backendURL}/api/comment/list/${contentId}`
+                );
+                
+                if (response.status === 404) {
+                    commentList.innerHTML = '<div class="empty-state">Nenhum comentário encontrado para este conteúdo</div>';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
+                const comments = await response.json();
+                console.log('✅ Comentários recebidos:', comments);
+                
+                displayComments(comments);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar comentários:', error);
+                commentList.innerHTML = `<div class="empty-state" style="color: #dc3545;">Erro ao carregar comentários: ${error.message}</div>`;
+            }
+        }
+        function displayComments(comments) {
+            if (!comments || comments.length === 0) {
+                commentList.innerHTML = '<div class="empty-state">Nenhum comentário encontrado</div>';
+                return;
+            }
+
+            commentList.innerHTML = '';
+            
+            comments.forEach(comment => {
+                const commentItem = document.createElement('div');
+                commentItem.classList.add('commentItem');
+                commentItem.innerHTML = `
+                    <strong>${escapeHtml(comment.email)}</strong>
+                    <p>${escapeHtml(comment.comment)}</p>
+                `;
+                commentList.appendChild(commentItem);
             });
         }
-
-        fetchComments();
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        document.getElementById('contentId').addEventListener('change', function() {
+            if (this.value) {
+                fetchComments(this.value);
+            }
+        });
+        commentList.innerHTML = '<div class="empty-state">Digite um ID de conteúdo acima e adicione o primeiro comentário!</div>';
     </script>
 </body>
 </html>
