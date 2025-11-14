@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 resource "aws_lambda_function" "lambda" {
   function_name = "${var.app_name}-daily-writer"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "handler.lambda_handler"
+  handler       = "put_s3.lambda_handler"
   runtime       = "python3.12"
   timeout       = 30
 
