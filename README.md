@@ -1,60 +1,140 @@
-# API de Coméntarios
-# 26 de Março de 2024 - Luiz Filipe Santana Martins
+# API de Comentários – Versão 2  
+## 14 de Novembro de 2025 – Luiz Filipe Santana Martins
 
-Este documento descreve as tecnologias utilizadas, a arquitetura implementada e as customizações realizadas no projeto.
-Na pasta imagens do projeto, contém evidências como testes, diagrama de arquitetura e redes, teste de API, frontend e environment no GitHub.
+Este documento descreve as tecnologias utilizadas, a arquitetura implementada, as customizações realizadas no projeto e os novos recursos adicionados na versão **v2**.  
+Na pasta **/imagens** do projeto encontram-se evidências como testes, diagrama de arquitetura e redes, testes de API, frontend e environment no GitHub.
+
+---
 
 ## Tecnologias Utilizadas
 
 - **Python**: Utilizado para desenvolver a API recebida.
-- **Docker**: Utilizado para containerizar a aplicação e garantir a portabilidade.
+- **Docker**: Utilizado para containerizar a aplicação e garantir portabilidade.
 - **Terraform**: Utilizado para provisionar a infraestrutura de forma declarativa e automatizada.
-- **AWS**: Utilizado como provedor de nuvem.
-- **ECS (Amazon Elastic Container Service)**: Selecionado para orquestrar os contêineres da aplicação.
-- **Fargate**: Utilizado para execução de contêineres sem gerenciar a infraestrutura subjacente.
-- **GitHub Actions**: Utilizado para automação de CI/CD.
-- **KICS (Keeping Infrastructure as Code Secure)**: Ferramenta open source utilizada para análise de segurança do código Terraform.
+- **AWS**: Provedor de nuvem utilizado.
+- **ECS (Amazon Elastic Container Service)**: Responsável por orquestrar os contêineres da aplicação.
+- **Fargate**: Plataforma serverless para execução dos contêineres.
+- **EventBridge** *(v2)*: Utilizado para agendamento de rotinas automáticas.
+- **AWS Lambda** *(v2)*: Função responsável por geração automática de arquivos no S3.
+- **GitHub Actions**: Automação de CI/CD.
+- **KICS (Keeping Infrastructure as Code Secure)**: Análise de segurança do código Terraform.
+
+---
 
 ## Descrição da Infraestrutura
 
-A infraestrutura foi projetada para garantir alta disponibilidade, escalabilidade e segurança da aplicação. Detalhes da infraestrutura incluem:
+A infraestrutura foi projetada visando alta disponibilidade, escalabilidade, automação e segurança.
 
-- **VPC (Virtual Private Cloud)**: Isola a infraestrutura da aplicação, proporcionando uma rede privada na nuvem da AWS. Isso permite um controle preciso sobre a segurança e a conectividade dos recursos.
-- **Subnets Públicas e Privadas**: As subnets públicas são utilizadas para recursos que precisam de acesso à internet, como o Load Balancer, enquanto as subnets privadas são utilizadas para recursos que não precisam de acesso direto à internet, garantindo uma camada adicional de segurança.
-- **ECS Cluster**: Gerencia os contêineres da aplicação de forma eficiente, escalável e altamente disponível. Ele ajusta dinamicamente a capacidade com base nas demandas de tráfego, garantindo um desempenho consistente.
-- **Load Balancer**: Distribui o tráfego entre os contêineres da aplicação, melhorando o desempenho e a disponibilidade, além de permitir atualizações e manutenções sem interrupções no serviço.
-- **Bucket S3**: Armazena o frontend estático da aplicação de forma durável e escalável, com redundância e alta disponibilidade integradas.
-- **Repositório ECR**: Armazena as imagens Docker da aplicação com segurança, permitindo um controle preciso sobre as versões e facilitando a implantação automatizada.
+### Componentes Principais
 
-## Customizações no Projeto Base
+- **VPC (Virtual Private Cloud)**  
+  Isola toda a infraestrutura em uma rede privada, permitindo controle detalhado de segurança e conectividade.
 
-- **Biblioteca de Logging**: Implementada na API Python para coletar métricas da aplicação como por exemplo, status code, requisições HTTP, tempo de resposta, erros ... E monitorar seu desempenho, permitindo uma análise detalhada do comportamento da aplicação em produção.
-- **Rota Raiz ("/")**: Adicionada para permitir o health check do ECS, garantindo a disponibilidade da aplicação e facilitando o monitoramento contínuo.
+- **Subnets Públicas e Privadas**  
+  - *Públicas*: Utilizadas para o Load Balancer.  
+  - *Privadas*: Utilizadas para ECS Fargate e demais recursos internos.
+
+- **ECS Cluster**  
+  Gerencia e executa os contêineres da aplicação de maneira escalável e altamente disponível.
+
+- **Load Balancer**  
+  Distribui o tráfego entre tasks ECS garantindo resiliência e atualizações sem downtime.
+
+- **Bucket S3**  
+  Armazena o **frontend estático** e, a partir da v2, também recebe **arquivos gerados automaticamente pelo Lambda**.
+
+- **Repositório ECR**  
+  Armazena imagens Docker da aplicação com versionamento e segurança.
+
+---
+
+## Novidades da Versão 2 (v2)
+
+A v2 introduz um novo componente serverless responsável por executar uma rotina automática diária.
+
+### 🆕 **Rotina Automática com AWS Lambda + EventBridge**
+
+Foi adicionada uma função **AWS Lambda** que é executada diariamente às **10:00 AM (UTC)** através de uma regra agendada do **EventBridge**.
+
+A função:
+
+- Gera um arquivo contendo informações da data/hora exata da execução.
+- Salva o arquivo no **mesmo bucket S3** utilizado pelo frontend estático.
+- Utiliza nomeação baseada em timestamp para permitir auditoria e rastreabilidade.
+
+Esse recurso amplia a automação do sistema e demonstra uso de arquitetura orientada a eventos (event-driven).
+
+---
+
+## Customizações no Projeto
+
+- **Biblioteca de Logging**  
+  Implementada na API Python para coletar métricas como status code, requisições HTTP, tempo de resposta, erros e demais indicadores importantes.
+
+- **Rota Raiz ("/")**  
+  Criada para servir como health check utilizado pelo ECS.
+
+- **Lambda Automatizado (v2)**  
+  Criado para executar uma rotina diária via EventBridge e armazenar resultados automaticamente no S3.
+
+---
 
 ## Diagramas de Arquitetura
 
-Foi criado um diagrama representando a arquitetura atual do projeto, destacando os principais componentes e a interação entre eles. Além disso, foi desenvolvido um outro diagrama que ilustra uma possível arquitetura alternativa, considerando cenários em que houvesse mais tempo de execução para explorar outras opções e otimizações.
+O projeto contém:
+
+- **Diagrama Arquitetural da v1**  
+  Representando ECS, ECR, VPC, Subnets, ALB e S3 para frontend.
+
+- **Diagrama Arquitetural da v2**  
+  Inclui os novos componentes:
+  - EventBridge Rule
+  - Lambda Function
+  - Persistência automática de arquivos no S3  
+  - Integração com o bucket já existente no ambiente
+
+Esses diagramas estão disponíveis na pasta **/imagens**.
+
+---
 
 ## Pipeline de CI/CD
 
-A pipeline de CI/CD automatiza o processo de construção, teste e implantação da aplicação. Ela inclui:
+A pipeline de CI/CD automatiza:
 
-- **Deploy do Terraform**: Provisiona a infraestrutura de forma consistente e segura, permitindo a implantação rápida e confiável dos recursos necessários.
-- **Análise de Segurança com KICS**: Identifica potenciais vulnerabilidades na infraestrutura, evidenciando um ambiente seguro e protegido contra ameaças.
-- **Construção e Envio da Imagem Docker**: Compila a aplicação e a disponibiliza no repositório ECR, permitindo uma implantação eficiente e automatizada.
-- **Atualização do Serviço ECS**: Atualiza automaticamente o serviço ECS com a nova versão da aplicação, garantindo a implantação contínua e sem interrupções.
+- **Deploy do Terraform**  
+  Criação e atualização da infraestrutura.
+
+- **Análise de Segurança com KICS**  
+  Validação do código IaC para evitar vulnerabilidades.
+
+- **Build e Push da Imagem Docker**  
+  Nova imagem enviada para o repositório ECR.
+
+- **Atualização do ECS Service**  
+  Publicação contínua da aplicação sem interrupções.
+
+---
 
 ## Métricas da Aplicação
 
-Para obter métricas da aplicação e demais logs, basta acessar o painel da AWS no ECS, serviços na aba logs e será possível ver a aplicação e seus registros.
+As métricas e logs da aplicação estão disponíveis via **ECS → Serviço → Aba “Logs”**, onde é possível acompanhar o comportamento da API em tempo real.
+
+A Lambda da v2 também possui logs disponíveis no **CloudWatch Logs**.
+
+---
 
 ## Conclusão
 
-A escolha das tecnologias e arquitetura foi guiada pela busca de eficiência, escalabilidade e segurança, visando garantir uma operação suave e confiável da aplicação na nuvem. A integração de ferramentas open source e práticas de DevOps permite uma abordagem ágil e iterativa no desenvolvimento e implantação do software. A infraestrutura e os processos de CI/CD foram cuidadosamente projetados para garantir um ambiente de produção robusto e altamente disponível, capaz de atender às demandas crescentes dos usuários.
+A migração para a v2 adiciona automação serverless à arquitetura, tornando o sistema mais robusto, auditável e preparado para cenários de maior complexidade.  
+A combinação entre ECS, Lambda, S3 e EventBridge cria um ambiente altamente escalável, seguro e com excelente custo-benefício.
+
+---
 
 ## Cenário Futuro
 
-Em um cenário de maior tempo para execução do projetos, tais medidas seriam consideradas:
+Para versões posteriores, as seguintes melhorias poderão ser implementadas:
 
-- **Correção de Vulnerabilidades no ECR e no KICS**: Seriam corrigidas as vulnerabilidades apontadas no repositório ECR e pelo KICS, garantindo uma infraestrutura e aplicação mais segura e resiliente.
-- **Aprimoramento da Arquitetura**: Seria implementada uma arquitetura mais robusta e escalável, considerando a adição de redundância, segurança avançada, e demais serviços.
+- Correção aprofundada de vulnerabilidades reportadas pelo ECR e KICS.
+- Ampliação da arquitetura para redundância multi-AZ e multi-região.
+- Implementação de monitoramento avançado com CloudWatch Dashboards e métricas customizadas.
+- Expansão do uso de serviços serverless conforme necessidade.

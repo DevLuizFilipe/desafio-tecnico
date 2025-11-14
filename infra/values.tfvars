@@ -50,3 +50,6 @@ ecs = [
     service_name       = "comments"
   }
 ]
+
+######################## S3 Values ###########################
+bucket_name = "squad-desafio-tecnico-devops"

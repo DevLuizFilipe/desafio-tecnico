@@ -46,3 +46,10 @@ variable "ecs" {
   description = "ECS Configuration"
   type        = any
 }
+
+
+######################## S3 Values ###########################
+variable "bucket_name" {
+  description = "S3 Bucket Name"
+  type        = string
+}
