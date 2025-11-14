@@ -13,7 +13,7 @@ provider "aws" {
 terraform {
   required_version = ">= 1.11.0"
   backend "s3" {
-    bucket       = "squad-terraform-tfstate-versioning"
+    bucket       = "squad-terraform-tfstate"
     key          = "terraform.tfstate"
     region       = "us-east-2"
     encrypt      = true
