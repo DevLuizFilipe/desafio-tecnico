@@ -1,5 +1,5 @@
 ######################## General Values ########################
-region   = "us-west-2"
+region   = "us-east-2"
 env      = "production"
 app_name = "Comments"
 ######################## ECR Values ############################
@@ -43,10 +43,13 @@ ecs = [
     container_cpu      = 256
     container_memory   = 512
     container_port     = 8000
-    image_url          = "092801936354.dkr.ecr.us-west-2.amazonaws.com/comments:latest"
+    image_url          = "324441770547.dkr.ecr.us-east-2.amazonaws.com/comments:latest"
     public_subnets     = "public*"
     private_subnets    = "private*"
     remote_cidr_blocks = ["0.0.0.0/0"] #CIDR block to allow traffic from
     service_name       = "comments"
   }
 ]
+
+######################## S3 Values ###########################
+bucket_name = "squad-desafio-tecnico-devops"

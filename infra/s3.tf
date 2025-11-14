@@ -1,6 +1,7 @@
-resource "aws_s3_bucket_object" "object" {
-  bucket = "globo-desafio-tecnico-devops"
+resource "aws_s3_object" "object" {
+  bucket = var.bucket_name
   key    = "index.html"
   source = "../front/index.html"
   acl    = "public-read"
+  content_type = "text/html"
 }
