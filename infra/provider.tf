@@ -11,8 +11,12 @@ provider "aws" {
 }
 
 terraform {
+  required_version = ">= 1.11.0"
   backend "s3" {
-    bucket = "terraform-tfstate-versioning"
-    key    = "terraform.tfstate"
+    bucket       = "squad-terraform-tfstate-versioning"
+    key          = "terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    use_lockfile = true
   }
 }

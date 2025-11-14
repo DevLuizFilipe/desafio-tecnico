@@ -63,8 +63,8 @@ resource "aws_lambda_function" "lambda" {
 }
 
 resource "aws_eventbridge_rule" "daily_rule" {
-  name        = "${var.app_name}-daily-rule"
-  description = "Executa o Lambda diariamente às 10:00 horário de São Paulo (13:00 UTC)"
+  name                = "${var.app_name}-daily-rule"
+  description         = "Executa o Lambda diariamente às 10:00 horário de São Paulo (13:00 UTC)"
   schedule_expression = "cron(0 13 * * ? *)"
 }
 
