@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 import time
 import logging
+from flask_cors import CORS
 
 app_name = 'comentarios'
 app = Flask(app_name)
 app.debug = True
+
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 comments = {}
 
@@ -27,7 +30,6 @@ def after_request(response):
         content_length = response.calculate_content_length()
         logger.info("%s %s %s %s %s %s", method, path, status_code, runtime, remote_addr, content_length)
     return response
-######################################
 
 @app.route('/api/comment/new', methods=['POST'])
 def api_comment_new():
@@ -68,13 +70,9 @@ def api_comment_list(content_id):
         }
         return jsonify(response), 404
 
-# Rota para health check do Target Group #
-
 @app.route('/')
 def index():
     return 'Application running', 200
 
 if __name__ == "__main__":
     app.run()
-
-##########################################
