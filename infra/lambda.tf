@@ -37,14 +37,6 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
-resource "aws_lambda_permission" "allow_eventbridge" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_eventbridge_rule.daily_rule.arn
-}
-
 resource "aws_lambda_function" "lambda" {
   function_name = "${var.app_name}-daily-writer"
   role          = aws_iam_role.lambda_role.arn
@@ -62,14 +54,22 @@ resource "aws_lambda_function" "lambda" {
   }
 }
 
-resource "aws_eventbridge_rule" "daily_rule" {
+resource "aws_cloudwatch_event_rule" "daily_rule" {
   name                = "${var.app_name}-daily-rule"
   description         = "Executa o Lambda diariamente às 10:00 horário de São Paulo (13:00 UTC)"
   schedule_expression = "cron(0 13 * * ? *)"
 }
 
-resource "aws_eventbridge_target" "lambda_target" {
-  rule      = aws_eventbridge_rule.daily_rule.name
+resource "aws_cloudwatch_event_target" "lambda_target" {
+  rule      = aws_cloudwatch_event_rule.daily_rule.name
   target_id = "lambda-target"
-  arn       = lambda_arn.value
+  arn       = aws_lambda_function.lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_rule.arn
 }
