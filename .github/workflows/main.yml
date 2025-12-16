@@ -96,7 +96,7 @@ jobs:
       - name: Terraform Apply
         working-directory: ./infra/
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false -var-file=values.tfvars
+        run: terraform destroy -auto-approve -input=false -var-file=values.tfvars
 
   Build:
     name: Build and push docker image
@@ -151,3 +151,4 @@ jobs:
       - name: Update Amazon ECS Service
         run: |
           aws ecs update-service --region $AWS_REGION --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+
